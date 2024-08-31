@@ -13,11 +13,11 @@ Here's the formatted version:
 
 **Assigned By:** CodeClause Internship
 
-**Assigned To:**KRITIKA RAJ
+**Assigned To:** KRITIKA RAJ
 
-**Start Date:**1st AUG
+**Start Date:** 1st AUG
 
-**End Date:**31th AUG 
+**End Date:** 31th AUG 
 
 **Project Details:**
 
