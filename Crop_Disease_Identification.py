@@ -4,7 +4,7 @@ import tensorflow as tf
 from tensorflow.keras import models, layers
 import matplotlib.pyplot as plt
 
-# %% [markdown]
+
 # Set all the Constants (Hyperparameters)
 # Hyperparameters are settings that define important aspects of the training process.
 # 
@@ -20,10 +20,9 @@ import matplotlib.pyplot as plt
 # For example, RGB images have three channels (Red, Green, Blue), while grayscale images have one channel.
 # The number of channels affects how the model processes the images.
 
-# %%
 #Importing Data
 
-# %%
+
 dataset = tf.keras.preprocessing.image_dataset_from_directory(
     directory='PlantVillage',  # Folder with the images
     seed=123,                  # Random seed for shuffling
@@ -33,7 +32,6 @@ dataset = tf.keras.preprocessing.image_dataset_from_directory(
 )
 
 
-# %% [markdown]
 # Sure, here's a simpler explanation:
 # 
 # ---
@@ -58,24 +56,19 @@ dataset = tf.keras.preprocessing.image_dataset_from_directory(
 #    - This sets how many images to process at once. The `BATCH_SIZE` variable holds this number. Using batches helps manage memory and speeds up training.
 # 
 
-# %%
 class_names = dataset.class_names
 class_names
-
-# %%
 for image_batch, label_batch in dataset.take(1):
     print("Image Batch Shape:", image_batch.shape)  # Shows the shape of the batch of images
     print("Single Image:", image_batch[0])          # Displays the first image in the batch
     print("Label Image numpy:", label_batch.numpy)  # Converts the labels to numpy format and displays them
 
 
-# %%
+
 len(class_names)
 
-# %%
-#Visualize some of the images from our dataset
 
-# %%
+#Visualize some of the images from our dataset
 plt.figure(figsize=(10, 10))  # Create a figure that's 10x10 inches
 for image_batch, labels_batch in dataset.take(1):  # Take one batch of images and labels from the dataset
     for i in range(12):  # Loop through the first 12 images in the batch
@@ -84,8 +77,6 @@ for image_batch, labels_batch in dataset.take(1):  # Take one batch of images an
         plt.title(class_names[labels_batch[i]])  # Set the title to the class name of the image
         plt.axis("off")  # Hide the axis
 
-
-# %%
 #Function to Split Dataset
 #We need to divide the dataset into three parts:
 
@@ -93,32 +84,22 @@ for image_batch, labels_batch in dataset.take(1):  # Take one batch of images an
 #Validation: Used to check the model’s performance during training.
 #Test: Used to evaluate the model after training is complete.
 
-# %%
 len(dataset)
 
-# %%
 train_size = 0.8
 len(dataset) * train_size
-
-# %%
-
 train_ds = dataset.take(54)
 len(train_ds)
 
-# %%
 val_size = 0.1
 len(dataset)*val_size
 
-# %%
 val_ds = test_ds.take(6)
 len(val_ds)
-
-# %%
 
 test_ds = test_ds.skip(6)
 len(test_ds)
 
-# %%
 def get_dataset_partitions_tf(ds, train_split=0.8, val_split=0.1, test_split=0.1, shuffle=True, shuffle_size=10000):
     assert (train_split + test_split + val_split) == 1
     
@@ -137,54 +118,40 @@ def get_dataset_partitions_tf(ds, train_split=0.8, val_split=0.1, test_split=0.1
     return train_ds, val_ds, test_ds
 train_ds, val_ds, test_ds = get_dataset_partitions_tf(dataset)
 
-# %%
+
 len(train_ds)
 
-# %%
 
 
-# %%
 len(val_ds)
 
-# %%
+
 len(test_ds)
 
-# %%
 
-
-# %%
 train_ds = train_ds.cache().shuffle(1000).prefetch(buffer_size=tf.data.AUTOTUNE)
 val_ds = val_ds.cache().shuffle(1000).prefetch(buffer_size=tf.data.AUTOTUNE)
 test_ds = test_ds.cache().shuffle(1000).prefetch(buffer_size=tf.data.AUTOTUNE)
 
-# %%
-
-
-# %%
 resize_and_rescale = tf.keras.Sequential([
     layers.experimental.preprocessing.Resizing(IMAGE_SIZE, IMAGE_SIZE),  # Resize images to IMAGE_SIZE x IMAGE_SIZE
     layers.experimental.preprocessing.Rescaling(1./255),  # Scale pixel values to be between 0 and 1
 ])
 
 
-# %%
 #Data Augmentation
 
-
-# %%
 data_augmentation = tf.keras.Sequential([
     layers.experimental.preprocessing.RandomFlip("horizontal_and_vertical"),  # Randomly flip images horizontally and vertically
     layers.experimental.preprocessing.RandomRotation(0.2),  # Randomly rotate images by 20%
 ])
 
 
-# %% [markdown]
 # This code creates a sequence of two steps to augment the data:
 # 
 # Random Flip: Randomly flips the images both horizontally and vertically.
 # Random Rotation: Randomly rotates the images by up to 20%.
 
-# %%
 input_shape = (BATCH_SIZE, IMAGE_SIZE, IMAGE_SIZE, CHANNEL)
 n_classes = 3
 
@@ -209,18 +176,14 @@ model = models.Sequential([
 
 model.build(input_shape=input_shape)  # Build the model with the specified input shape
 
-
-# %%
 model.summary()
 
-# %%
 model.compile(
     optimizer='adam',
     loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False),
     metrics=['accuracy']
 )
 
-# %%
 history = model.fit(
     train_ds,
     batch_size=BATCH_SIZE,
@@ -229,30 +192,23 @@ history = model.fit(
     epochs=20,
 )
 
-# %%
-
 scores = model.evaluate(test_ds)
 
-# %%
 model.save("model.h5")
 
-# %%
 #Plotting the Accuracy and Loss Curves
 print(history)
 print(history.params)
 print(history.history.keys())
 
-# %%
 history.history['loss'][:5] # show loss for first 5 epochs
 
-# %%
 acc = history.history['accuracy']
 val_acc = history.history['val_accuracy']
 
 loss = history.history['loss']
 val_loss = history.history['val_loss']
 
-# %%
 # Create a figure that's 8x8 inches
 plt.figure(figsize=(8, 8))
 
@@ -273,12 +229,9 @@ plt.title('Training and Validation Loss')  # Set the title
 # Display the plots
 plt.show()
 
-
-# %%
 #Run prediction on a sample image
 model = tf.keras.models.load_model('model.h5')
 
-# %%
 
 import numpy as np
 for images_batch, labels_batch in test_ds.take(1):
@@ -293,10 +246,9 @@ for images_batch, labels_batch in test_ds.take(1):
     batch_prediction = model.predict(images_batch)
     print("predicted label:",class_names[np.argmax(batch_prediction[0])])
 
-# %%
 #Write a function for inference
 
-# %%
+
 def predict(model, img):
     img_array = tf.keras.preprocessing.image.img_to_array(images[i].numpy())
     img_array = tf.expand_dims(img_array, 0)
@@ -307,7 +259,6 @@ def predict(model, img):
     confidence = round(100 * (np.max(predictions[0])), 2)
     return predicted_class, confidence
 
-# %%
 plt.figure(figsize=(15, 15))
 for images, labels in test_ds.take(1):
     for i in range(9):
